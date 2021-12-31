@@ -1,5 +1,7 @@
 const { ApolloServer, gql } = require('apollo-server');
 const { getDogs, getCats } = require('./services');
+const { ApolloServerPluginLandingPageGraphQLPlayground } = require("apollo-server-core");
+
 
 
 const typeDefs = gql`
@@ -52,10 +54,10 @@ const resolvers = {
             if (type === "DOG") {
                 return getDogs({ page, limit });
             } else if (type === "Cat") {
-                return getDogs({ page, limit });
+                return getCats({ page, limit });
             }
 
-            const [cats, dogs] = await Promise.all([getDogs({ page, limit }), getDogs({ page, limit })]);
+            const [cats, dogs] = await Promise.all([getDogs({ page, limit }), getCats({ page, limit })]);
 
             return cats.concat(dogs);
         }
@@ -64,8 +66,13 @@ const resolvers = {
 
 
 const server = new ApolloServer({
+    playground: true,
+    introspection: true,
     typeDefs,
     resolvers,
+    plugins: [
+        ApolloServerPluginLandingPageGraphQLPlayground({ env: 'development' }),
+    ],
 });
 
 
